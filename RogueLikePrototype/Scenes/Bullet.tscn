@@ -1,0 +1,90 @@
+[gd_scene load_steps=8 format=3 uid="uid://barlpuc18re7s"]
+
+[ext_resource type="Texture2D" uid="uid://bsjbjduragbnv" path="res://Graphics/Bullet.png" id="1_oaje4"]
+[ext_resource type="Script" path="res://Scripts/Bullet.gd" id="1_th3es"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sywul"]
+size = Vector2(14, 4)
+
+[sub_resource type="Animation" id="Animation_maaxr"]
+resource_name = "Fade"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Bullet:self_modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "method"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.2),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"queue_free"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_t0s03"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Bullet:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_avkmv"]
+_data = {
+"Fade": SubResource("Animation_maaxr"),
+"RESET": SubResource("Animation_t0s03")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mqgl2"]
+size = Vector2(14, 4)
+
+[node name="Bullet" type="CharacterBody2D" groups=["Bullet"]]
+script = ExtResource("1_th3es")
+
+[node name="Bullet" type="Sprite2D" parent="."]
+z_index = 2
+position = Vector2(0, 1)
+scale = Vector2(2, 2)
+texture = ExtResource("1_oaje4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_sywul")
+disabled = true
+
+[node name="FadeTimer" type="Timer" parent="."]
+wait_time = 0.2
+
+[node name="State" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_avkmv")
+}
+
+[node name="HurtArea" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtArea"]
+shape = SubResource("RectangleShape2D_mqgl2")
+
+[connection signal="timeout" from="FadeTimer" to="." method="_on_fade_timer_timeout"]
+[connection signal="body_entered" from="HurtArea" to="." method="_on_hurt_area_body_entered"]

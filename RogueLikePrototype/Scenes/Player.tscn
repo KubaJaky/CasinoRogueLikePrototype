@@ -1,0 +1,136 @@
+[gd_scene load_steps=14 format=3 uid="uid://qfmef8xu6klm"]
+
+[ext_resource type="Script" path="res://Scripts/Player.gd" id="1_gwtek"]
+[ext_resource type="Texture2D" uid="uid://6vkxspvib2cl" path="res://Graphics/Player1.png" id="2_hlyqg"]
+[ext_resource type="Texture2D" uid="uid://c8tg530jty50y" path="res://Graphics/Player2.png" id="3_0v0q2"]
+[ext_resource type="Texture2D" uid="uid://cm03gjsrn84tk" path="res://Graphics/Player3.png" id="4_5q3m3"]
+[ext_resource type="PackedScene" uid="uid://bmofjjwcni8os" path="res://Scenes/Uzi.tscn" id="5_l2528"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_iiogv"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_hlyqg")
+}],
+"loop": true,
+"name": &"Stand",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_0v0q2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_5q3m3")
+}],
+"loop": true,
+"name": &"Walk",
+"speed": 7.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_c1c68"]
+size = Vector2(24, 17.5)
+
+[sub_resource type="Curve" id="Curve_swsw3"]
+_data = [Vector2(0, 0.954545), 0.0, 0.82852, 0, 0, Vector2(1, 0), -3.74255, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_uhy3q"]
+curve = SubResource("Curve_swsw3")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_h7xm3"]
+emission_shape = 3
+emission_box_extents = Vector3(10, 1, 1)
+particle_flag_disable_z = true
+direction = Vector3(-1, -1, 0)
+spread = 15.0
+gravity = Vector3(0, 98, 0)
+initial_velocity_min = 75.0
+initial_velocity_max = 100.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+scale_min = 5.0
+scale_max = 10.0
+scale_curve = SubResource("CurveTexture_uhy3q")
+
+[sub_resource type="Animation" id="Animation_71yii"]
+resource_name = "RoomTransition"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UI/ColorRect:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_cqtfm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UI/ColorRect:modulate")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wb1n2"]
+_data = {
+"RESET": SubResource("Animation_cqtfm"),
+"RoomTransition": SubResource("Animation_71yii")
+}
+
+[node name="Player" type="CharacterBody2D" groups=["Player"]]
+script = ExtResource("1_gwtek")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+z_index = 1
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_iiogv")
+animation = &"Stand"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(0, 7.25)
+shape = SubResource("RectangleShape2D_c1c68")
+
+[node name="Weapon" parent="." instance=ExtResource("5_l2528")]
+z_index = 1
+
+[node name="Weapon2" parent="." instance=ExtResource("5_l2528")]
+z_index = -1
+position = Vector2(6, 4)
+
+[node name="Run_Particles" type="GPUParticles2D" parent="."]
+position = Vector2(0, 13)
+emitting = false
+amount = 12
+process_material = SubResource("ParticleProcessMaterial_h7xm3")
+lifetime = 0.75
+speed_scale = 1.5
+
+[node name="ScreenAnim" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_wb1n2")
+}
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="UI"]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)

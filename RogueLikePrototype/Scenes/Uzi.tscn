@@ -1,0 +1,64 @@
+[gd_scene load_steps=6 format=3 uid="uid://bmofjjwcni8os"]
+
+[ext_resource type="Script" path="res://Scripts/Uzi.gd" id="1_t4a7t"]
+[ext_resource type="Texture2D" uid="uid://lt6bkj6w6lvy" path="res://Graphics/Uzi.png" id="2_3g16u"]
+
+[sub_resource type="Animation" id="Animation_o4rkl"]
+resource_name = "Shoot"
+length = 0.4
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Uzi:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, -2, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.1, 0.4)
+}
+
+[sub_resource type="Animation" id="Animation_0umya"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Uzi:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_k4wjd"]
+_data = {
+"RESET": SubResource("Animation_0umya"),
+"Shoot": SubResource("Animation_o4rkl")
+}
+
+[node name="Weapon" type="Node2D"]
+position = Vector2(-1, 4.5)
+script = ExtResource("1_t4a7t")
+
+[node name="Uzi" type="Sprite2D" parent="."]
+z_index = 1
+position = Vector2(0, 2)
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("2_3g16u")
+
+[node name="BulletPoint" type="Node2D" parent="."]
+position = Vector2(9, -3.5)
+
+[node name="ShootCD" type="Timer" parent="."]
+wait_time = 0.1
+one_shot = true
+
+[node name="GunAnimations" type="AnimationPlayer" parent="."]
+speed_scale = 5.0
+libraries = {
+"": SubResource("AnimationLibrary_k4wjd")
+}
+
+[connection signal="timeout" from="ShootCD" to="." method="_on_shoot_cd_timeout"]
